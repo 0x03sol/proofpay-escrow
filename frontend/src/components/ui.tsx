@@ -2,25 +2,28 @@ import type { ReactNode } from 'react';
 import { INVOICE_STATUS } from '../lib/abis';
 import { statusTone, shortAddr } from '../lib/format';
 import { explorerAddr } from '../lib/config';
+import { useI18n } from '../i18n';
 
 export function StatusBadge({ status }: { status: number }) {
+  const { t } = useI18n();
   const tone = statusTone(status);
   return (
     <span className={`badge ${tone}`}>
       <span className="dot" />
-      {INVOICE_STATUS[status] ?? 'Unknown'}
+      {t(`inv.${INVOICE_STATUS[status] ?? 'None'}`)}
     </span>
   );
 }
 
-export function VerifiedBadge({ verified, label = 'Dojang verified' }: { verified: boolean; label?: string }) {
+export function VerifiedBadge({ verified, label }: { verified: boolean; label?: string }) {
+  const { t } = useI18n();
   return verified ? (
-    <span className="badge verified" title="Verified Address attestation is live on Dojang">
-      <SealIcon /> {label}
+    <span className="badge verified" title="Dojang">
+      <SealIcon /> {label ?? t('status.dojangVerified')}
     </span>
   ) : (
-    <span className="badge neutral" title="No live Verified Address attestation">
-      <span className="dot" /> unverified
+    <span className="badge neutral">
+      <span className="dot" /> {t('status.unverified')}
     </span>
   );
 }

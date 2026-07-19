@@ -4,8 +4,10 @@ import { CreateInvoice } from '../components/CreateInvoice';
 import { InvoiceDetail } from '../components/InvoiceDetail';
 import { fetchInvoices, type InvoiceRecord } from '../lib/data';
 import type { WalletState } from '../hooks/useWallet';
+import { useI18n } from '../i18n';
 
 export function AppView({ wallet }: { wallet: WalletState }) {
+  const { t } = useI18n();
   const [invoices, setInvoices] = useState<InvoiceRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<number | null>(null);
@@ -22,28 +24,26 @@ export function AppView({ wallet }: { wallet: WalletState }) {
 
   useEffect(() => {
     void load();
-    const t = setInterval(() => void load(), 15000);
-    return () => clearInterval(t);
+    const timer = setInterval(() => void load(), 15000);
+    return () => clearInterval(timer);
   }, [load]);
 
   if (selected !== null) {
     return (
-      <main className="shell" style={{ padding: '32px 0 64px', maxWidth: 820 }}>
+      <main className="shell" style={{ padding: '40px 0 80px', maxWidth: 820 }}>
         <InvoiceDetail id={selected} wallet={wallet} onBack={() => { setSelected(null); void load(); }} />
       </main>
     );
   }
 
   return (
-    <main className="shell" style={{ padding: '32px 0 64px' }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 18 }}>
+    <main className="shell" style={{ padding: '40px 0 80px' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 24, gap: 16, flexWrap: 'wrap' }}>
         <div>
-          <h1 style={{ fontSize: 26 }}>Invoices</h1>
-          <p className="dim" style={{ fontSize: 14, marginTop: 4 }}>
-            Read live from the ProofPay contracts on GIWA Sepolia.
-          </p>
+          <h1 style={{ fontSize: 'clamp(28px, 4vw, 40px)' }}>{t('app.title')}</h1>
+          <p className="dim" style={{ fontSize: 16, marginTop: 6 }}>{t('app.sub')}</p>
         </div>
-        <button className="btn btn-sm btn-ghost" onClick={() => void load()}>Refresh</button>
+        <button className="btn btn-sm btn-ghost" onClick={() => void load()}>{t('app.refresh')}</button>
       </div>
 
       <div className="grid-2">

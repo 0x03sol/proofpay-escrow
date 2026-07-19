@@ -3,7 +3,7 @@ import { Header } from './components/Header';
 import { Home } from './views/Home';
 import { AppView } from './views/AppView';
 import { useWallet } from './hooks/useWallet';
-import { CHAIN_NAME } from './lib/config';
+import { useI18n } from './i18n';
 
 type Route = 'home' | 'app';
 
@@ -13,6 +13,7 @@ function routeFromHash(): Route {
 
 export default function App() {
   const wallet = useWallet();
+  const { t } = useI18n();
   const [route, setRoute] = useState<Route>(routeFromHash());
 
   useEffect(() => {
@@ -41,13 +42,13 @@ export default function App() {
             padding: '9px 12px',
           }}
         >
-          Wrong network. Switch your wallet to {CHAIN_NAME} to transact.{' '}
+          {t('wallet.wrongChain')}{' '}
           <button
             className="mono"
             onClick={() => void wallet.switchChain()}
             style={{ background: 'none', border: 'none', color: 'inherit', textDecoration: 'underline', cursor: 'pointer' }}
           >
-            Switch now
+            {t('wallet.switchNow')}
           </button>
         </div>
       )}

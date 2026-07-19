@@ -4,11 +4,27 @@ import { Spinner, VerifiedBadge, GithubIcon } from './ui';
 import type { WalletState } from '../hooks/useWallet';
 import { shortAddr } from '../lib/format';
 import { isVerified } from '../lib/data';
-import { CHAIN_NAME, REPO_URL } from '../lib/config';
+import { REPO_URL } from '../lib/config';
+import { useI18n } from '../i18n';
 
 type Route = 'home' | 'app';
 
+function LangToggle() {
+  const { lang, setLang } = useI18n();
+  return (
+    <div className="langtoggle" role="group" aria-label="Language">
+      <button className={lang === 'ko' ? 'on' : ''} onClick={() => setLang('ko')}>
+        KO
+      </button>
+      <button className={lang === 'en' ? 'on' : ''} onClick={() => setLang('en')}>
+        EN
+      </button>
+    </div>
+  );
+}
+
 export function Header({ route, go, wallet }: { route: Route; go: (r: Route) => void; wallet: WalletState }) {
+  const { t } = useI18n();
   const [verified, setVerified] = useState(false);
 
   useEffect(() => {
@@ -31,39 +47,34 @@ export function Header({ route, go, wallet }: { route: Route; go: (r: Route) => 
         </a>
         <nav className="nav">
           <a className={route === 'home' ? 'active' : ''} onClick={() => go('home')}>
-            Overview
+            {t('nav.overview')}
           </a>
           <a className={route === 'app' ? 'active' : ''} onClick={() => go('app')}>
-            Invoices
+            {t('nav.invoices')}
           </a>
         </nav>
         <div className="spacer" />
 
-        <a
-          className="ghlink"
-          href={REPO_URL}
-          target="_blank"
-          rel="noreferrer"
-          aria-label="ProofPay source on GitHub"
-          title="View source on GitHub"
-        >
+        <LangToggle />
+
+        <a className="ghlink" href={REPO_URL} target="_blank" rel="noreferrer" aria-label="GitHub">
           <GithubIcon />
         </a>
 
-        {wallet.account && !wallet.wrongChain && verified && <VerifiedBadge verified label="up.id ready" />}
+        {wallet.account && !wallet.wrongChain && verified && <VerifiedBadge verified label={t('wallet.upidReady')} />}
 
         {!wallet.hasWallet ? (
           <a className="btn btn-sm" href="https://metamask.io/download/" target="_blank" rel="noreferrer">
-            Install a wallet
+            {t('wallet.install')}
           </a>
         ) : !wallet.account ? (
-          <button className="btn btn-accent" onClick={() => void wallet.connect()} disabled={wallet.isConnecting}>
+          <button className="btn btn-accent btn-sm" onClick={() => void wallet.connect()} disabled={wallet.isConnecting}>
             {wallet.isConnecting ? <Spinner /> : null}
-            {wallet.isConnecting ? 'Connecting' : 'Connect wallet'}
+            {wallet.isConnecting ? t('wallet.connecting') : t('wallet.connect')}
           </button>
         ) : wallet.wrongChain ? (
-          <button className="btn btn-accent" onClick={() => void wallet.switchChain()}>
-            Switch to {CHAIN_NAME}
+          <button className="btn btn-accent btn-sm" onClick={() => void wallet.switchChain()}>
+            {t('wallet.switch')}
           </button>
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -72,7 +83,7 @@ export function Header({ route, go, wallet }: { route: Route; go: (r: Route) => 
               {shortAddr(wallet.account)}
             </span>
             <button className="btn btn-sm btn-ghost" onClick={wallet.disconnect}>
-              Disconnect
+              {t('wallet.disconnect')}
             </button>
           </div>
         )}

@@ -9,8 +9,10 @@ import { ADDRESSES } from '../lib/config';
 import { isVerified } from '../lib/data';
 import { ZERO } from '../lib/format';
 import type { WalletState } from '../hooks/useWallet';
+import { useI18n } from '../i18n';
 
 export function CreateInvoice({ wallet, onCreated }: { wallet: WalletState; onCreated: () => void }) {
+  const { t } = useI18n();
   const tx = useTx();
   const [verified, setVerified] = useState<boolean | null>(null);
   const [amount, setAmount] = useState('');
@@ -36,8 +38,8 @@ export function CreateInvoice({ wallet, onCreated }: { wallet: WalletState; onCr
   if (!wallet.account) {
     return (
       <div className="panel panel-pad">
-        <h3 style={{ fontSize: 17, marginBottom: 8 }}>Create an invoice</h3>
-        <p className="dim" style={{ fontSize: 14 }}>Connect a wallet to issue an invoice.</p>
+        <h3 style={{ fontSize: 19, marginBottom: 8 }}>{t('create.title')}</h3>
+        <p className="dim" style={{ fontSize: 15 }}>{t('create.connect')}</p>
       </div>
     );
   }
@@ -45,9 +47,9 @@ export function CreateInvoice({ wallet, onCreated }: { wallet: WalletState; onCr
   if (wallet.wrongChain) {
     return (
       <div className="panel panel-pad">
-        <h3 style={{ fontSize: 17, marginBottom: 8 }}>Create an invoice</h3>
-        <p className="dim" style={{ fontSize: 14, marginBottom: 12 }}>Switch to GIWA Sepolia to continue.</p>
-        <button className="btn btn-accent" onClick={() => void wallet.switchChain()}>Switch network</button>
+        <h3 style={{ fontSize: 19, marginBottom: 8 }}>{t('create.title')}</h3>
+        <p className="dim" style={{ fontSize: 15, marginBottom: 14 }}>{t('create.switch')}</p>
+        <button className="btn btn-accent" onClick={() => void wallet.switchChain()}>{t('wallet.switch')}</button>
       </div>
     );
   }
@@ -58,11 +60,11 @@ export function CreateInvoice({ wallet, onCreated }: { wallet: WalletState; onCr
     try {
       value = parseEther(amount || '0');
     } catch {
-      setFormErr('Enter a valid ETH amount');
+      setFormErr(t('create.err.amount'));
       return;
     }
-    if (value <= 0n) return setFormErr('Amount must be greater than zero');
-    if (payer && !isAddress(payer)) return setFormErr('Expected payer is not a valid address');
+    if (value <= 0n) return setFormErr(t('create.err.positive'));
+    if (payer && !isAddress(payer)) return setFormErr(t('create.err.payer'));
 
     const documentHash = keccak256(stringToHex(reference || `proofpay:${Date.now()}`));
     const refundAfter = BigInt(Math.max(0, Math.floor(Number(refundHours) || 0)) * 3600);
@@ -86,50 +88,43 @@ export function CreateInvoice({ wallet, onCreated }: { wallet: WalletState; onCr
 
   return (
     <div className="panel panel-pad">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-        <h3 style={{ fontSize: 17 }}>Create an invoice</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h3 style={{ fontSize: 19 }}>{t('create.title')}</h3>
         {verified !== null && <VerifiedBadge verified={verified} />}
       </div>
 
       {verified === false && (
-        <div
-          className="panel-pad"
-          style={{ background: 'var(--bg-raise)', borderRadius: 8, border: '1px solid var(--line)', marginBottom: 16 }}
-        >
-          <p className="dim" style={{ fontSize: 13.5 }}>
-            This wallet has no live Dojang Verified Address attestation, so the registry will reject an invoice from it.
-            On GIWA Sepolia these attestations are issued by Upbit Korea. The full verified flow is covered by the
-            contract test suite against the live Dojang stack.
-          </p>
+        <div style={{ background: 'var(--surface-2)', borderRadius: 12, border: '1px solid var(--line)', padding: 16, marginBottom: 18 }}>
+          <p className="dim" style={{ fontSize: 14 }}>{t('create.gate')}</p>
         </div>
       )}
 
-      <Field label="Amount (ETH)" hint="Held in escrow until you release, refund, or a dispute resolves.">
+      <Field label={t('create.amount')} hint={t('create.amount.hint')}>
         <input className="input" inputMode="decimal" placeholder="0.05" value={amount} onChange={(e) => setAmount(e.target.value)} />
       </Field>
 
-      <Field label="Invoice reference" hint="Hashed on-chain (keccak256). The text itself never leaves your browser.">
-        <input className="input" placeholder="INV-2026-014 / order id" value={reference} onChange={(e) => setReference(e.target.value)} />
+      <Field label={t('create.ref')} hint={t('create.ref.hint')}>
+        <input className="input" placeholder="INV-2026-014" value={reference} onChange={(e) => setReference(e.target.value)} />
       </Field>
 
-      <Field label="Expected payer (optional)" hint="Leave blank to allow any payer.">
+      <Field label={t('create.payer')} hint={t('create.payer.hint')}>
         <input className="input" placeholder="0x…" value={payer} onChange={(e) => setPayer(e.target.value)} />
       </Field>
 
-      <Field label="Timeout refund window (hours)" hint="After this passes with no release, anyone can refund the payer. 0 disables it.">
+      <Field label={t('create.window')} hint={t('create.window.hint')}>
         <input className="input" inputMode="numeric" value={refundHours} onChange={(e) => setRefundHours(e.target.value)} />
       </Field>
 
-      <label style={{ display: 'flex', gap: 9, alignItems: 'center', fontSize: 14, color: 'var(--text-dim)', marginBottom: 16, cursor: 'pointer' }}>
+      <label style={{ display: 'flex', gap: 10, alignItems: 'center', fontSize: 14, color: 'var(--text-dim)', marginBottom: 18, cursor: 'pointer' }}>
         <input type="checkbox" checked={requirePayer} onChange={(e) => setRequirePayer(e.target.checked)} />
-        Require the payer to also be Dojang-verified
+        {t('create.requirePayer')}
       </label>
 
-      {formErr && <p className="mono" style={{ color: 'var(--dispute)', fontSize: 12, marginBottom: 12 }}>{formErr}</p>}
+      {formErr && <p className="mono" style={{ color: 'var(--dispute)', fontSize: 13, marginBottom: 14 }}>{formErr}</p>}
 
       <button className="btn btn-accent" style={{ width: '100%' }} disabled={tx.busy} onClick={() => void submit()}>
         {tx.busy ? <Spinner /> : null}
-        {tx.busy ? 'Submitting' : 'Create invoice'}
+        {tx.busy ? t('create.submitting') : t('create.submit')}
       </button>
 
       <TxStatus tx={tx} />
