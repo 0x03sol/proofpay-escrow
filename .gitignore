@@ -1,0 +1,38 @@
+# Secrets - never publish
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.keystore
+
+# Node
+node_modules/
+
+# Foundry build artifacts
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+
+# Backend
+backend/dist/
+backend/data/
+
+# Frontend
+frontend/dist/
+
+# Assistant / AI tooling artifacts - never publish
+.kiro/
+**/.kiro/
+.claude/
+CLAUDE.md
+AGENTS.md
+.cursor/
+.aider*
+memory/
+*.memory
+dapp-*.md
+
+# OS
+.DS_Store
+Thumbs.db
