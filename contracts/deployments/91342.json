@@ -1,10 +1,11 @@
 {
-  "DisputeModule": "0x9B3B6932f67aBD3F67313fD8eB4c3F2E65ced198",
-  "DojangScroll": "0xd5077b67dcb56caC8b270C7788FC3E6ee03F17B9",
-  "DojangVerifier": "0x6c117CC7fA20356EAf426E6B3181211A9DFab337",
-  "InvoiceRegistry": "0xff540b77a9710a470E356F499aF79fF94d5eB9b1",
-  "ProofPayEscrow": "0xEA140bC50D628A0eBacC8bc9d6998D6E5F265c26",
+  "DisputeModule": "0x42eE8bacF973dCAdfB4B1fE6C6AAF2454875D8da",
+  "DojangScroll": "0x0000000000000000000000000000000000000000",
+  "DojangVerifier": "0x12ADaE62CC2941639bFB5276B68076f549Dd6EDA",
+  "InvoiceRegistry": "0x9A778D36Ad2cb48Ca27a54Ff102E405F23c9A231",
+  "ProofPayEscrow": "0x8117cfa450B85Fceeac2B2e57855a2cea9a84953",
   "chainId": 91342,
-  "deployedBlock": 31110739,
+  "demoVerifier": true,
+  "deployedBlock": 31119849,
   "feeBps": 50
 }

@@ -76,10 +76,13 @@ export async function fetchInvoiceDetail(id: number): Promise<InvoiceDetail> {
     isVerified(invoice.merchant),
   ]);
 
+  // getEscrow returns a zero struct when unfunded — treat amount==0 as "no escrow".
   let escrow: EscrowState | null = null;
   if (escrowRaw) {
     const [payer, fundedAt, disputed, amount] = escrowRaw as [`0x${string}`, bigint, boolean, bigint];
-    escrow = { payer, fundedAt, disputed, amount };
+    if (amount > 0n) {
+      escrow = { payer, fundedAt, disputed, amount };
+    }
   }
 
   let payerVerified: boolean | null = null;

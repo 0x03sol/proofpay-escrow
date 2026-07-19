@@ -77,7 +77,7 @@ export function Home({ go }: { go: (r: 'home' | 'app') => void }) {
               ['ProofPayEscrow', ADDRESSES.proofPayEscrow],
               ['InvoiceRegistry', ADDRESSES.invoiceRegistry],
               ['DisputeModule', ADDRESSES.disputeModule],
-              ['DojangVerifier', ADDRESSES.dojangVerifier],
+              ['DojangVerifier (testnet demo)', ADDRESSES.dojangVerifier],
               ['DojangScroll (GIWA)', ADDRESSES.dojangScroll],
             ] as const
           ).map(([name, addr], i, arr) => (

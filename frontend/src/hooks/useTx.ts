@@ -25,6 +25,24 @@ export function phaseText(p: TxPhase): string {
   return PHASE_TEXT[p];
 }
 
+/** Pull a short, human-readable reason out of viem / wallet errors. */
+function shortenTxError(e: unknown): string {
+  const raw = e instanceof Error ? e.message : String(e);
+  if (/MerchantNotVerified|0x64d9a9fa/i.test(raw)) {
+    return 'MerchantNotVerified — wallet has no live Dojang Verified Address';
+  }
+  if (/PayerNotVerified/i.test(raw)) {
+    return 'PayerNotVerified — payer must be Dojang verified for this invoice';
+  }
+  if (/User rejected|user rejected|denied/i.test(raw)) {
+    return 'Rejected in wallet';
+  }
+  // viem often puts the useful line after "Details:" or "Reason:"
+  const details = raw.match(/Details:\s*(.+)/i)?.[1] ?? raw.match(/reason:\s*(.+)/i)?.[1];
+  const line = (details ?? raw.split('\n')[0]).trim();
+  return line.slice(0, 220);
+}
+
 export function useTx(): TxState {
   const [phase, setPhase] = useState<TxPhase>('idle');
   const [hash, setHash] = useState<Hash | null>(null);
@@ -54,9 +72,7 @@ export function useTx(): TxState {
       return false;
     } catch (e) {
       setPhase('error');
-      const msg = e instanceof Error ? e.message : String(e);
-      // surface the concise revert reason if present
-      setError(msg.split('\n')[0].slice(0, 200));
+      setError(shortenTxError(e));
       return false;
     }
   }, []);

@@ -3,7 +3,7 @@ import { keccak256, parseEther, stringToHex, isAddress } from 'viem';
 import { Field, VerifiedBadge, Spinner } from './ui';
 import { TxStatus } from './TxStatus';
 import { useTx } from '../hooks/useTx';
-import { walletClientFor } from '../lib/clients';
+import { publicClient, walletClientFor } from '../lib/clients';
 import { registryAbi } from '../lib/abis';
 import { ADDRESSES } from '../lib/config';
 import { isVerified } from '../lib/data';
@@ -15,6 +15,7 @@ export function CreateInvoice({ wallet, onCreated }: { wallet: WalletState; onCr
   const { t } = useI18n();
   const tx = useTx();
   const [verified, setVerified] = useState<boolean | null>(null);
+  const [requireMerch, setRequireMerch] = useState<boolean | null>(null);
   const [amount, setAmount] = useState('');
   const [reference, setReference] = useState('');
   const [payer, setPayer] = useState('');
@@ -24,9 +25,26 @@ export function CreateInvoice({ wallet, onCreated }: { wallet: WalletState; onCr
 
   useEffect(() => {
     let live = true;
+    void publicClient
+      .readContract({
+        address: ADDRESSES.invoiceRegistry,
+        abi: registryAbi,
+        functionName: 'requireVerifiedMerchant',
+      })
+      .then((v) => live && setRequireMerch(Boolean(v)))
+      .catch(() => live && setRequireMerch(true));
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let live = true;
     if (wallet.account && !wallet.wrongChain) {
       setVerified(null);
-      void isVerified(wallet.account).then((v) => live && setVerified(v)).catch(() => live && setVerified(false));
+      void isVerified(wallet.account)
+        .then((v) => live && setVerified(v))
+        .catch(() => live && setVerified(false));
     } else {
       setVerified(null);
     }
@@ -54,8 +72,15 @@ export function CreateInvoice({ wallet, onCreated }: { wallet: WalletState; onCr
     );
   }
 
+  const blocked = requireMerch === true && verified === false;
+
   async function submit() {
     setFormErr(null);
+    if (blocked) {
+      setFormErr(t('create.err.merchantNotVerified'));
+      return;
+    }
+
     let value: bigint;
     try {
       value = parseEther(amount || '0');
@@ -93,9 +118,14 @@ export function CreateInvoice({ wallet, onCreated }: { wallet: WalletState; onCr
         {verified !== null && <VerifiedBadge verified={verified} />}
       </div>
 
-      {verified === false && (
+      {verified === false && blocked && (
         <div style={{ background: 'var(--surface-2)', borderRadius: 12, border: '1px solid var(--line)', padding: 16, marginBottom: 18 }}>
           <p className="dim" style={{ fontSize: 14 }}>{t('create.gate')}</p>
+        </div>
+      )}
+      {verified === false && !blocked && (
+        <div style={{ background: 'var(--surface-2)', borderRadius: 12, border: '1px solid var(--line)', padding: 16, marginBottom: 18 }}>
+          <p className="dim" style={{ fontSize: 14 }}>{t('create.gate.soft')}</p>
         </div>
       )}
 
@@ -122,9 +152,15 @@ export function CreateInvoice({ wallet, onCreated }: { wallet: WalletState; onCr
 
       {formErr && <p className="mono" style={{ color: 'var(--dispute)', fontSize: 13, marginBottom: 14 }}>{formErr}</p>}
 
-      <button className="btn btn-accent" style={{ width: '100%' }} disabled={tx.busy} onClick={() => void submit()}>
+      <button
+        className="btn btn-accent"
+        style={{ width: '100%' }}
+        disabled={tx.busy || blocked}
+        title={blocked ? t('create.blocked') : undefined}
+        onClick={() => void submit()}
+      >
         {tx.busy ? <Spinner /> : null}
-        {tx.busy ? t('create.submitting') : t('create.submit')}
+        {tx.busy ? t('create.submitting') : blocked ? t('create.blocked') : t('create.submit')}
       </button>
 
       <TxStatus tx={tx} />

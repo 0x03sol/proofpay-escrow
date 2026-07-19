@@ -110,10 +110,12 @@ export function InvoiceDetail({ id, wallet, onBack }: { id: number; wallet: Wall
           </span>
         </Row>
         <Row k={t('detail.payer')}>
-          {inv.payer === ZERO && !d.escrow ? (
+          {d.escrow ? (
+            <AddrLink addr={d.escrow.payer} />
+          ) : inv.payer === ZERO ? (
             <span className="faint">{t('detail.anyPayer')}</span>
           ) : (
-            <AddrLink addr={d.escrow?.payer ?? inv.payer} />
+            <AddrLink addr={inv.payer} />
           )}
         </Row>
         <Row k={t('detail.receives')}>
@@ -123,6 +125,11 @@ export function InvoiceDetail({ id, wallet, onBack }: { id: number; wallet: Wall
           {fmtEth(split.fee)} {tokenLabel(inv.token)}
         </Row>
         <Row k={t('detail.created')}>{fmtDate(inv.createdAt)}</Row>
+        {inv.refundAfter > 0n && !d.escrow && (
+          <Row k={t('detail.refundWindow')}>
+            {t('detail.refundWindowVal').replace('{h}', String(Number(inv.refundAfter) / 3600))}
+          </Row>
+        )}
         {inv.refundAfter > 0n && d.escrow && (
           <Row k={t('detail.timeoutAt')}>{fmtDate(Number(d.escrow.fundedAt) + Number(inv.refundAfter))}</Row>
         )}
@@ -139,8 +146,11 @@ export function InvoiceDetail({ id, wallet, onBack }: { id: number; wallet: Wall
 
         {!needWallet && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+            {inv.status === 1 && canFundAsMe && native && !d.merchantVerified && (
+              <p className="dim" style={{ fontSize: 14, width: '100%' }}>{t('detail.fundBlocked')}</p>
+            )}
             {inv.status === 1 && canFundAsMe && native && (
-              <button className="btn btn-accent" onClick={fund} disabled={tx.busy}>
+              <button className="btn btn-accent" onClick={fund} disabled={tx.busy || !d.merchantVerified}>
                 {t('detail.fund')} · {fmtEth(inv.amount)} ETH
               </button>
             )}

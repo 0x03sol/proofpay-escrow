@@ -76,6 +76,11 @@ export const STRINGS: Dict = {
   'create.connect': { ko: '인보이스를 발행하려면 지갑을 연결하세요.', en: 'Connect a wallet to issue an invoice.' },
   'create.switch': { ko: '계속하려면 GIWA 세폴리아로 전환하세요.', en: 'Switch to GIWA Sepolia to continue.' },
   'create.gate': { ko: '이 지갑에는 유효한 Dojang 인증 주소가 없어 레지스트리가 인보이스를 거부합니다. GIWA 세폴리아에서는 업비트 코리아가 이 인증을 발급합니다.', en: 'This wallet has no live Dojang Verified Address attestation, so the registry will reject an invoice from it. On GIWA Sepolia these attestations are issued by Upbit Korea.' },
+  'create.gate.soft': {
+    ko: '이 지갑은 아직 Dojang 미검증입니다. 테스트넷에서는 인보이스 생성은 가능하지만, 입금(fund) 시에는 판매자 검증이 다시 필요합니다.',
+    en: 'This wallet is not Dojang-verified yet. On testnet you can still create invoices, but funding re-checks merchant verification on-chain.',
+  },
+  'create.blocked': { ko: 'Dojang 검증 후에만 생성할 수 있습니다', en: 'Create is blocked until Dojang verification' },
   'create.amount': { ko: '금액 (ETH)', en: 'Amount (ETH)' },
   'create.amount.hint': { ko: '지급, 환불, 또는 분쟁 해결 시까지 에스크로에 보관됩니다.', en: 'Held in escrow until you release, refund, or a dispute resolves.' },
   'create.ref': { ko: '인보이스 참조', en: 'Invoice reference' },
@@ -90,6 +95,10 @@ export const STRINGS: Dict = {
   'create.err.amount': { ko: '유효한 ETH 금액을 입력하세요', en: 'Enter a valid ETH amount' },
   'create.err.positive': { ko: '금액은 0보다 커야 합니다', en: 'Amount must be greater than zero' },
   'create.err.payer': { ko: '예상 지불인 주소가 올바르지 않습니다', en: 'Expected payer is not a valid address' },
+  'create.err.merchantNotVerified': {
+    ko: '판매자 미검증: Dojang 인증 주소가 없어 createInvoice가 거부되었습니다.',
+    en: 'Merchant not verified: createInvoice rejected — no live Dojang Verified Address.',
+  },
 
   'detail.loading': { ko: '인보이스를 불러오는 중', en: 'Loading invoice' },
   'detail.invoice': { ko: '인보이스', en: 'Invoice' },
@@ -106,6 +115,12 @@ export const STRINGS: Dict = {
   'detail.actions': { ko: '작업', en: 'Actions' },
   'detail.connectToAct': { ko: '이 인보이스에 대해 작업하려면 GIWA 세폴리아에 연결하세요.', en: 'Connect to GIWA Sepolia to act on this invoice.' },
   'detail.fund': { ko: '에스크로 입금', en: 'Fund escrow' },
+  'detail.fundBlocked': {
+    ko: '판매자가 Dojang 미검증이라 입금이 거부됩니다. 에스크로는 입금 시점에 판매자 검증을 다시 확인합니다.',
+    en: 'Funding is blocked: merchant is not Dojang-verified. Escrow re-checks merchant verification at fund time.',
+  },
+  'detail.refundWindow': { ko: '환불 대기 기간', en: 'Refund window' },
+  'detail.refundWindowVal': { ko: '입금 후 {h}시간', en: '{h}h after funding' },
   'detail.erc20note': { ko: 'ERC-20 입금은 토큰 승인 단계가 필요합니다. 이 데모는 네이티브 ETH 인보이스를 사용합니다.', en: 'ERC-20 funding needs a token approval step; this demo uses native ETH invoices.' },
   'detail.cancel': { ko: '인보이스 취소', en: 'Cancel invoice' },
   'detail.release': { ko: '판매자에게 지급', en: 'Release to merchant' },
