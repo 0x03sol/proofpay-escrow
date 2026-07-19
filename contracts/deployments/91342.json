@@ -1,0 +1,10 @@
+{
+  "DisputeModule": "0x9B3B6932f67aBD3F67313fD8eB4c3F2E65ced198",
+  "DojangScroll": "0xd5077b67dcb56caC8b270C7788FC3E6ee03F17B9",
+  "DojangVerifier": "0x6c117CC7fA20356EAf426E6B3181211A9DFab337",
+  "InvoiceRegistry": "0xff540b77a9710a470E356F499aF79fF94d5eB9b1",
+  "ProofPayEscrow": "0xEA140bC50D628A0eBacC8bc9d6998D6E5F265c26",
+  "chainId": 91342,
+  "deployedBlock": 31110739,
+  "feeBps": 50
+}
